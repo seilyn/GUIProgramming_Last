@@ -4,6 +4,7 @@
  * 작성자 : 유찬영
  * ********************************/
 
+// 12-07 유찬영 수정 : 공격 기능 구현
 using System;
 using UnityEngine;
 
@@ -28,15 +29,20 @@ public class Controller : MonoBehaviour
     bool jumpKeyDown;   // 캐릭터 점프
     bool attackKeyDown; // 공격
     bool qKeyDown;      // Q 키 입력
+    bool eKeyDown;     
 
     bool swapKeyDown;
     bool weaponTypeA;
     bool weaponTypeB;
+    
 
-    bool isJump;      // 점프 상태
-    bool isAttack;    // 공격 상태 
-
+    bool isJump;        // 점프 상태
+    bool isAttack;      // 공격 상태 
+    bool isAtkReady;    // 공격 준비 상태
+                        
+    float atkDelay;     // 공격 딜레이
     GameObject nearObject;
+    Weapons equipWeapon; // 장착된 무기
 
     /// <summary>
     /// MonoBehavior Method
@@ -126,17 +132,35 @@ public class Controller : MonoBehaviour
     {
         int weaponIndex = -1;
         if (weaponTypeA) weaponIndex = 1;
-        if (weaponTypeB) weaponIndex = 2;
-        if ((weaponTypeA || weaponTypeB) && !isJump)
+        if (weaponTypeB) weaponIndex = 0;
+        if ((weaponTypeA || weaponTypeB) && !isJump) //점프 상태가 아니면서, 무기의 Type이 A거나 B 일때 실행됩니다.
         {
+            // 빈손일때는 비활성화합니다.
+            if (equipWeapon != null) equipWeapon.gameObject.SetActive(false);
+            equipWeapon = weapons[weaponIndex].GetComponent<Weapons>(); // Weapons 타입으로 형변환합니다.
             weapons[weaponIndex].SetActive(true);
         }
 
     }
     private void CharacterAttack()
     {
+        if (equipWeapon == null) return;
 
+        // 공격딜레이에 시간을 더해줍니다.
+        atkDelay += Time.deltaTime;
+
+        //공격가능 여부를 체크합니다.
+        isAtkReady = equipWeapon.atkSpeed < atkDelay; 
+
+        // 공격 조건은 'E' 키가 눌러졌을 때, 공격 가능 여부가 True일때, 그리고 점프 상태가 아닐때 공격조건이 성립합니다.
+        if (attackKeyDown && isAtkReady && !isJump) 
+        {
+            // 공격을 합니다.
+            equipWeapon.TypeCheck();
+            atkDelay = 0;
+        }
     }
+
     /// <summary>
     /// 근처 물체가 null 값이 아니면서, 점프 상태가 아니고, Q 키를 눌렀을 때 동작하는 함수를 선언합니다.
     /// </summary>

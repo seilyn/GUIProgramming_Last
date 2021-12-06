@@ -8,6 +8,7 @@ TagManager:
   - Dagger
   - Weapon
   - Weapons
+  - Melee
   layers:
   - Default
   - TransparentFX
