@@ -198,7 +198,7 @@ public class Controller : MonoBehaviour
         {
             nearObject = other.gameObject;
         }
-        Debug.Log(nearObject.name);
+        
     }
     /// <summary>
     /// 
