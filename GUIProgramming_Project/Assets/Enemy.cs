@@ -6,21 +6,29 @@
 
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
     public int maxHP;
     public int curHP;
+    public Transform target;
 
     Rigidbody rigidBody;
     BoxCollider boxCollider;
     Material material;
+    NavMeshAgent nav;
     
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
-        material = GetComponent<MeshRenderer>().material;
+        material = GetComponentInChildren<MeshRenderer>().material;
+        nav = GetComponent<NavMeshAgent>();
+    }
+    void Update()
+    {
+        nav.SetDestination(target.position);
     }
     /// <summary>
     /// 캐릭터가 가지고 있는 무기와 충돌 판정이 발생할 시 HP를 감소시킵니다.
@@ -36,6 +44,7 @@ public class Enemy : MonoBehaviour
             Weapons weapons = other.GetComponent<Weapons>();
             //현재 체력에서 무기의 Damage만큼 감소시킵니다.
             curHP -= weapons.damage;
+
 
             // 코루틴을 실행합니다.
             StartCoroutine(OnDamage(damagedAction));
@@ -66,7 +75,7 @@ public class Enemy : MonoBehaviour
             rigidBody.AddForce(damagedAction * 1, ForceMode.Impulse);
 
             material.color = Color.gray;
-            Destroy(gameObject, 2);
+            Destroy(gameObject, 1);
         }
     }
 }
